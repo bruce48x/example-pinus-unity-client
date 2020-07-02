@@ -1,0 +1,8 @@
+.vscode
+node_modules
+client/library
+client/.vs
+logs
+client/Packages
+client/Temp
+client/obj

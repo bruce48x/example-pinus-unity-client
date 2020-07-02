@@ -1,0 +1,16 @@
+{
+  "nested": {
+    "connectorentryHandlerentry": {
+      "fields": {
+        "code": {
+          "type": "uint32",
+          "id": 1
+        },
+        "msg": {
+          "type": "string",
+          "id": 2
+        }
+      }
+    }
+  }
+}

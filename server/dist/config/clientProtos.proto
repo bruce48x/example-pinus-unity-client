@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message connectorentryHandlerentry {
+    string name = 1;
+}
