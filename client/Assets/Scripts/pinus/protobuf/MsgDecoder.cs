@@ -15,9 +15,10 @@ namespace Pomelo.Protobuf
 
         public MsgDecoder(JObject protos)
         {
-            if (protos == null) protos = new JObject();
-
-            this.protos = (JObject)protos["nested"];
+            if (protos == null)
+                this.protos = new JObject();
+            else
+                this.protos = protos;
             util = new Util();
         }
 

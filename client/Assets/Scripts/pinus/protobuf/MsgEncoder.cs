@@ -17,7 +17,7 @@ namespace Pomelo.Protobuf
             if (protos == null)
                 this.protos = new JObject();
             else
-                this.protos = protos["nested"].ToObject<JObject>();
+                this.protos = protos;
             util = new Util();
         }
 

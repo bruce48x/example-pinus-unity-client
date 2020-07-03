@@ -28,6 +28,8 @@ namespace Pomelo.DotNetClient
                 this.abbrs[pair.Value] = pair.Key;
             }
 
+            clientProtos = clientProtos["nested"].ToObject<JObject>();
+            serverProtos = serverProtos["nested"].ToObject<JObject>(); 
             protobuf = new Protobuf.Protobuf(clientProtos, serverProtos);
             this.encodeProtos = clientProtos;
             this.decodeProtos = serverProtos;
@@ -89,9 +91,10 @@ namespace Pomelo.DotNetClient
 
             //Encode body
             byte[] body;
-            if (encodeProtos.ContainsKey(route))
+            string normalizedRoute = normalizeRoute(route);
+            if (encodeProtos.ContainsKey(normalizedRoute))
             {
-                body = protobuf.encode(route, msg);
+                body = protobuf.encode(normalizedRoute, msg);
             }
             else
             {
@@ -114,6 +117,11 @@ namespace Pomelo.DotNetClient
             if (id > 0) reqMap.Add(id, route);
 
             return result;
+        }
+
+        public string normalizeRoute(string route)
+        {
+            return String.Join("", route.Split('.'));
         }
 
         public Message decode(byte[] buffer)
@@ -177,9 +185,10 @@ namespace Pomelo.DotNetClient
             }
 
             JObject msg;
-            if (decodeProtos.ContainsKey(route))
+            string normalizedRoute = normalizeRoute(route);
+            if (decodeProtos.ContainsKey(normalizedRoute))
             {
-                msg = protobuf.decode(route, body);
+                msg = protobuf.decode(normalizedRoute, body);
             }
             else
             {

@@ -758,10 +758,10 @@ pinus-monitor@^1.4.8:
   resolved "https://registry.yarnpkg.com/pinus-monitor/-/pinus-monitor-1.4.8.tgz#441c0c692f7087f4f37a382f7123bb933220a6ca"
   integrity sha512-3OPnvAKYdPBITFail8UOxL4MyEDzIE0BNAEIaTxFXoWlhHB0E/0UlGf5BJ5HFgxnj+a/dvP6NZzWBEkRKKumqQ==
 
-pinus-protobuf-plugin@2:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/pinus-protobuf-plugin/-/pinus-protobuf-plugin-2.0.0.tgz#02fc7e248958f31edba0cf57d5d8af7719d3aa2b"
-  integrity sha512-Xl7oB4Z7hI7qChtkZPC5WMNgYhpt3QZSSN9wPIHzZDeztrah64SYms8x2Aj9aL0dWR4yaj3r1k3hbdSOCDIJxQ==
+pinus-protobuf-plugin@^2.0:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/pinus-protobuf-plugin/-/pinus-protobuf-plugin-2.0.1.tgz#af6a3600adb4fe7b10e0a1b8105882ae84c956c0"
+  integrity sha512-stAtQZ3NKWgoObX3FrXOISmnOJH/4DwhK2EcIINI/ql4Mj4e33qi4VrM5FQu4gVguUwXiwgUlQTtNMiXbeQhHw==
   dependencies:
     mqtt-connection "^4.0.0"
     pinus "^1.4.0"
