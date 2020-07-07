@@ -1,10 +1,9 @@
 using System;
 using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Net.Sockets;
-using UnityEngine;
-using Newtonsoft.Json;
 
 namespace Pomelo.DotNetClient
 {
@@ -24,7 +23,6 @@ namespace Pomelo.DotNetClient
 
         public void request(object user, Action<JObject> callback)
         {
-            Debug.Log("send handshake" + user.ToString());
             byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(buildMsg(user)));
 
             protocol.send(PackageType.PKG_HANDSHAKE, body);
@@ -45,13 +43,13 @@ namespace Pomelo.DotNetClient
 
         private object buildMsg(object user)
         {
-            if (user == null) user = new System.Object();
+            if (user == null) user = new Object();
 
             //Build sys option
             var sys = new { version = Version, type = Type };
             //Build handshake message
             var msg = new { sys = sys, user = user };
-            Debug.Log("handshake msg = " + msg.ToString());
+
             return msg;
         }
     }

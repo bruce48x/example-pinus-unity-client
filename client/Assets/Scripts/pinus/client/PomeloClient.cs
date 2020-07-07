@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using UnityEngine;
 
 namespace Pomelo.DotNetClient
 {
@@ -166,7 +165,6 @@ namespace Pomelo.DotNetClient
             try
             {
                 protocol.start(user, handshakeCallback);
-                Debug.Log("sent handshake");
                 return true;
             }
             catch (Exception e)
@@ -218,7 +216,6 @@ namespace Pomelo.DotNetClient
 
         public void disconnect()
         {
-            Debug.Log("pomelo client disconnect");
             Dispose();
             NetWorkChanged(NetWorkState.DISCONNECTED);
         }
@@ -232,7 +229,6 @@ namespace Pomelo.DotNetClient
         // The bulk of the clean-up code
         protected virtual void Dispose(bool disposing)
         {
-            Debug.Log("pomelo client dispose");
             if (this.disposed)
                 return;
 

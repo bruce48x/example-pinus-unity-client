@@ -29,7 +29,7 @@ namespace Pomelo.DotNetClient
             }
 
             clientProtos = clientProtos["nested"].ToObject<JObject>();
-            serverProtos = serverProtos["nested"].ToObject<JObject>(); 
+            serverProtos = serverProtos["nested"].ToObject<JObject>();
             protobuf = new Protobuf.Protobuf(clientProtos, serverProtos);
             this.encodeProtos = clientProtos;
             this.decodeProtos = serverProtos;
@@ -91,7 +91,7 @@ namespace Pomelo.DotNetClient
 
             //Encode body
             byte[] body;
-            string normalizedRoute = normalizeRoute(route);
+            var normalizedRoute = normalizeRoute(route);
             if (encodeProtos.ContainsKey(normalizedRoute))
             {
                 body = protobuf.encode(normalizedRoute, msg);
@@ -185,7 +185,7 @@ namespace Pomelo.DotNetClient
             }
 
             JObject msg;
-            string normalizedRoute = normalizeRoute(route);
+            var normalizedRoute = normalizeRoute(route);
             if (decodeProtos.ContainsKey(normalizedRoute))
             {
                 msg = protobuf.decode(normalizedRoute, body);

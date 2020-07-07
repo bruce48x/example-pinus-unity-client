@@ -67,11 +67,15 @@ namespace Pomelo.Protobuf
             dic.Add("uint32", 0);
             dic.Add("sint32", 0);
             dic.Add("int32", 0);
+            dic.Add("uint64", 0);
+            dic.Add("sint64", 0);
+            dic.Add("int64", 0);
+            dic.Add("bool", 0);
             dic.Add("double", 1);
             dic.Add("string", 2);
-            dic.Add("float", 5);
             dic.Add("message", 2);
-            dic.Add("bool", 0);
+            dic.Add("repeated", 2);
+            dic.Add("float", 5);
 
             this.typeMap = dic;
         }
@@ -97,13 +101,15 @@ namespace Pomelo.Protobuf
                 return null;
             }
 
-            var obj = proto[name];
+            JToken obj = proto[name];
             if (obj is null)
             {
-                var nested = proto["nested"];
-                if (!(nested is null))
+                foreach (var pair in proto)
                 {
-                    return GetProtoMessage((JObject)nested, name);
+                    var nested = pair.Value["nested"];
+                    if (nested != null) {
+                        return GetProtoMessage((JObject)nested, name);
+                    }
                 }
             }
             else

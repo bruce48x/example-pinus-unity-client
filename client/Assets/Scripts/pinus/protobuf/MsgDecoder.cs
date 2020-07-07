@@ -22,15 +22,6 @@ namespace Pomelo.Protobuf
             util = new Util();
         }
 
-        /// <summary>
-        /// Decode message from server.
-        /// </summary>
-        /// <param name='route'>
-        /// Route.
-        /// </param>
-        /// <param name='buf'>
-        /// JObject.
-        /// </param>
         public JObject decode(string route, byte[] buf)
         {
             buffer = buf;
@@ -44,101 +35,81 @@ namespace Pomelo.Protobuf
             return null;
         }
 
-
-        /// <summary>
-        /// Decode the message.
-        /// </summary>
-        /// <returns>
-        /// The message.
-        /// </returns>
-        /// <param name='msg'>
-        /// JObject.
-        /// </param>
-        /// <param name='proto'>
-        /// JObject.
-        /// </param>
-        /// <param name='length'>
-        /// int.
-        /// </param>
         private JObject decodeMsg(JObject msg, JObject proto, int length)
         {
             while (offset < length)
             {
                 Dictionary<string, int> head = getHead();
                 int id;
-                if (head.TryGetValue("id", out id))
+                if (!head.TryGetValue("id", out id))
+                    continue;
+
+
+                var fields = proto["fields"];
+                if (fields is null)
+                    continue;
+
+                var fieldsDict = fields.ToObject<Dictionary<string, JObject>>();
+
+                foreach (KeyValuePair<string, JObject> pair in fieldsDict)
                 {
-                    var fields = proto["fields"];
-                    if (fields is null)
+                    var name = pair.Key;
+                    var field = pair.Value;
+
+                    var fieldId = field["id"];
+                    if (fieldId is null)
                         continue;
 
-                    var fieldsDict = fields.ToObject<Dictionary<string, JObject>>();
-
-                    foreach (KeyValuePair<string, JObject> pair in fieldsDict)
+                    if (Convert.ToInt32(fieldId) == id)
                     {
-                        var name = pair.Key;
-                        var field = pair.Value;
-
-                        var fieldId = field["id"];
-                        if (fieldId is null)
+                        var type = field["type"];
+                        if (type is null)
                             continue;
 
-                        if (Convert.ToInt32(fieldId) == id)
+                        var rule = field["rule"];
+                        if (rule is null)
                         {
-                            var type = field["type"];
-                            if (type is null)
-                                continue;
-
-                            var rule = field["rule"];
-                            if (rule is null)
+                            msg.Add(name, JToken.FromObject(decodeProp(type.ToString(), proto)));
+                        }
+                        else
+                        {
+                            if (rule.ToString() == "repeated")
                             {
-                                msg.Add(name, new JValue(decodeProp(type.ToString(), proto)));
-                            }
-                            else
-                            {
-                                if (rule.ToString() == "repeated")
+                                var msgVal = msg[name] as JArray;
+                                if (msgVal is null)
                                 {
-                                    var msgVal = msg[name];
-                                    if (msgVal is null)
-                                    {
-                                        msg.Add(name, new JValue(new List<object>()));
-                                    }
-                                    else
-                                    {
-                                        decodeArray(msgVal.ToObject<List<object>>(), type.ToString(), proto);
-                                    }
+                                    msgVal = new JArray();
+                                    msg.Add(name, msgVal);
                                 }
+                                decodeArray(msgVal, type.ToString(), proto);
                             }
                         }
                     }
-
                 }
             }
             return msg;
         }
 
-        /// <summary>
-        /// Decode array in message.
-        /// </summary>
-        private void decodeArray(List<object> list, string type, JObject proto)
+        private void decodeArray(JArray list, string type, JObject proto)
         {
+            uint length = Decoder.decodeUInt32(getBytes());
+            int curOffset = offset;
             if (util.isSimpleType(type))
             {
-                int length = (int)Decoder.decodeUInt32(getBytes());
-                for (int i = 0; i < length; i++)
+                while (offset < curOffset + length)
                 {
                     list.Add(decodeProp(type, null));
                 }
             }
             else
             {
-                list.Add(decodeProp(type, proto));
+                while (offset < curOffset + length)
+                {
+                    list.Add(decodeProp(type, proto));
+                }
             }
         }
 
-        /// <summary>
-        /// Decode each simple type in message.
-        /// </summary>
         private object decodeProp(string type, JObject proto)
         {
             switch (type)
@@ -162,7 +133,7 @@ namespace Pomelo.Protobuf
                 case "bool":
                     return decodeBool();
                 default:
-                    return decodeObject(type, proto);
+                    return decodeObject(type, protos);
             }
         }
 
