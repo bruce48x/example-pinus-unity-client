@@ -3,6 +3,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Pomelo.Protobuf
 {
@@ -34,7 +35,7 @@ namespace Pomelo.Protobuf
         {
             byte[] returnByte = null;
             JObject proto = util.GetProtoMessage(protos, route);
-            if (!(proto is null))
+            if (proto != null)
             {
                 int length = Encoder.byteLength(msg.ToString()) * 2;
                 int offset = 0;
@@ -54,16 +55,14 @@ namespace Pomelo.Protobuf
         /// </summary>
         private int encodeMsg(byte[] buffer, int offset, JObject proto, JObject msg)
         {
-            Console.WriteLine("encodeMsg proto = "+proto+", msg = "+msg);
             var msgDict = msg.ToObject<Dictionary<string, object>>();
             foreach (KeyValuePair<string, object> pair in msgDict)
             {
                 var key = pair.Key;
                 JObject protoField = util.GetField(proto, key);
                 if (protoField is null)
-                {
                     continue;
-                }
+
                 var fieldRule = protoField["rule"];
                 if (fieldRule is null)
                 {
@@ -80,7 +79,7 @@ namespace Pomelo.Protobuf
                     if (fieldRule.ToString() == "repeated")
                     {
                         var arr = msg[key];
-                        if (!(arr is null))
+                        if (arr != null)
                         {
                             var ls = arr.ToObject<List<object>>();
                             if (ls.Count > 0)
@@ -101,32 +100,22 @@ namespace Pomelo.Protobuf
         {
             var valueType = value["type"];
             var valueId = value["id"];
-            if (!(valueType is null) && !(valueId is null))
+            if (valueType != null && valueId != null)
             {
-                int length = Encoder.byteLength(msg.ToString()) * 2;
-                int subOffset = 0;
-                byte[] subBuff = new byte[length];
-                offset = writeBytes(buffer, offset, encodeTag("repeated", Convert.ToInt32(valueId)));
-                if (util.isSimpleType(valueType.ToString()))
+                foreach (object item in msg)
                 {
-                    foreach (object item in msg)
+                    int length = Encoder.byteLength(msg.ToString()) * 2;
+                    int subOffset = 0;
+                    byte[] subBuff = new byte[length];
+                    offset = writeBytes(buffer, offset, encodeTag("repeated", Convert.ToInt32(valueId)));
+                    subOffset = encodeProp(item, valueType.ToString(), subOffset, subBuff, proto);
+                    offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
+                    for (var i = 0; i < subOffset; i++)
                     {
-                        subOffset = encodeProp(item, valueType.ToString(), subOffset, subBuff, null);
+                        buffer[offset + i] = subBuff[i];
                     }
+                    offset += subOffset;
                 }
-                else
-                {
-                    foreach (object item in msg)
-                    {
-                        subOffset = encodeProp(item, valueType.ToString(), subOffset, subBuff, proto);
-                    }
-                }
-                offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
-                for (var i = 0; i < subOffset; i++)
-                {
-                    buffer[offset + i] = subBuff[i];
-                }
-                offset += subOffset;
             }
             return offset;
         }
@@ -166,7 +155,7 @@ namespace Pomelo.Protobuf
                     break;
                 default:
                     JObject message = util.GetProtoMessage(protos, type);
-                    Console.WriteLine("encodeProp type " + type + ", message " + message);
+                    //Console.WriteLine("encodeProp type " + type + ", message " + message);
                     if (!(message is null))
                     {
                         byte[] subBuff = new byte[Encoder.byteLength(value.ToString()) * 3];
@@ -181,7 +170,6 @@ namespace Pomelo.Protobuf
                     }
                     break;
             }
-            Console.WriteLine("after encodeProp type = " + type + ", offset = " + offset);
             return offset;
         }
 

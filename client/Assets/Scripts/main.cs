@@ -27,8 +27,16 @@ public class main : MonoBehaviour
             pclient.connect(user, data =>
             {
                 Debug.Log("发送消息");
-                //process handshake call back data
-                var msg = new JObject { { "name", "bruce" } };
+                var msg = JObject.Parse(@"{
+                    'name': 'bruce',
+                    'custom': { 'field1': 7, 'field2': 0.9, 'field3': 9.0, 'field4': false, 'arr': [0,1,0,1] },
+                    'customArr': [
+                        { 'field1': 123, 'field2': 1.1, 'field3': 2.1, 'field4': true, 'arr': [1,2,3] },
+                        { 'field1': 321, 'field2': 1.2, 'field3': 2.2, 'field4': false, 'arr': [4,5,6] },
+                        { 'field1': 234, 'field2': 1.3, 'field3': 2.3, 'field4': true, 'arr': [7,8,9] },
+                    ],
+                    'i64arr': [987,654,321]
+                }");
                 pclient.request("connector.entryHandler.entry", msg, (resp) =>
                 {
                     //process the data

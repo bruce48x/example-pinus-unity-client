@@ -1,14 +1,46 @@
 {
   "nested": {
+    "CustomMsg": {
+      "fields": {
+        "i32": {
+          "type": "uint32",
+          "id": 1
+        },
+        "i32arr": {
+          "rule": "repeated",
+          "type": "uint32",
+          "id": 2
+        }
+      }
+    },
     "connectorentryHandlerentry": {
       "fields": {
         "code": {
           "type": "uint32",
           "id": 1
         },
-        "msg": {
+        "rcvmsg": {
           "type": "string",
           "id": 2
+        },
+        "cusMsg": {
+          "type": "CustomMsg",
+          "id": 3
+        },
+        "msgArr": {
+          "rule": "repeated",
+          "type": "CustomMsg",
+          "id": 4
+        },
+        "flArr": {
+          "rule": "repeated",
+          "type": "float",
+          "id": 5
+        },
+        "dbArr": {
+          "rule": "repeated",
+          "type": "double",
+          "id": 6
         }
       }
     }

@@ -1,10 +1,49 @@
 {
   "nested": {
+    "CustomMsg": {
+      "fields": {
+        "field1": {
+          "type": "uint32",
+          "id": 1
+        },
+        "field2": {
+          "type": "float",
+          "id": 2
+        },
+        "field3": {
+          "type": "double",
+          "id": 3
+        },
+        "field4": {
+          "type": "bool",
+          "id": 4
+        },
+        "arr": {
+          "rule": "repeated",
+          "type": "uint32",
+          "id": 5
+        }
+      }
+    },
     "connectorentryHandlerentry": {
       "fields": {
         "name": {
           "type": "string",
           "id": 1
+        },
+        "custom": {
+          "type": "CustomMsg",
+          "id": 2
+        },
+        "customArr": {
+          "rule": "repeated",
+          "type": "CustomMsg",
+          "id": 3
+        },
+        "i64arr": {
+          "rule": "repeated",
+          "type": "uint32",
+          "id": 4
         }
       }
     }

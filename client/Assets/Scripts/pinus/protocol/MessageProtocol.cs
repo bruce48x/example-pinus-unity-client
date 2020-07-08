@@ -3,6 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using Pomelo.Protobuf;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace Pomelo.DotNetClient
 {

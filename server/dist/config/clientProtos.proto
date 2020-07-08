@@ -1,5 +1,16 @@
 syntax = "proto3";
 
+message CustomMsg {
+    uint32 field1 = 1;
+    float field2 = 2;
+    double field3 = 3;
+    bool field4 = 4;
+    repeated uint32 arr = 5;
+}
+
 message connectorentryHandlerentry {
     string name = 1;
+    CustomMsg custom = 2;
+    repeated CustomMsg customArr = 3;
+    repeated uint32 i64arr = 4;
 }
