@@ -35,7 +35,8 @@ public class main : MonoBehaviour
                         { 'field1': 321, 'field2': 1.2, 'field3': 2.2, 'arr': [4,5,6], 'field4': false },
                         { 'field1': 234, 'field2': 1.3, 'field3': 2.3, 'arr': [7,8,9], 'field4': true },
                     ],
-                    'i64arr': [987,654,321]
+                    'i32arr': [987, 654, 321],
+                    'flarr': [9.87, 6.54, 3.21]
                 }");
                 pclient.request("connector.entryHandler.entry", msg, (resp) =>
                 {

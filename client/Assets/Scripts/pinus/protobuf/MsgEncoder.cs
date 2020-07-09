@@ -102,13 +102,17 @@ namespace Pomelo.Protobuf
             var id = protoField["id"];
             if (type != null && id != null)
             {
-                foreach (object item in msg)
+                if (util.isSimpleType(type.ToString()))
                 {
+                    // 简单类型，packed 编码
                     int length = Encoder.byteLength(msg.ToString()) * 2;
                     int subOffset = 0;
                     byte[] subBuff = new byte[length];
                     offset = writeBytes(buffer, offset, encodeTag("repeated", Convert.ToInt32(id)));
-                    subOffset = encodeProp(item, type.ToString(), subOffset, subBuff, true);
+                    foreach (object item in msg)
+                    {
+                        subOffset = encodeProp(item, type.ToString(), subOffset, subBuff, true);
+                    }
                     offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
                     for (var i = 0; i < subOffset; i++)
                     {
@@ -116,6 +120,24 @@ namespace Pomelo.Protobuf
                     }
                     offset += subOffset;
                 }
+                else
+                {
+                    foreach (object item in msg)
+                    {
+                        int length = Encoder.byteLength(msg.ToString()) * 2;
+                        int subOffset = 0;
+                        byte[] subBuff = new byte[length];
+                        offset = writeBytes(buffer, offset, encodeTag("repeated", Convert.ToInt32(id)));
+                        subOffset = encodeProp(item, type.ToString(), subOffset, subBuff, true);
+                        offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
+                        for (var i = 0; i < subOffset; i++)
+                        {
+                            buffer[offset + i] = subBuff[i];
+                        }
+                        offset += subOffset;
+                    }
+                }
+
             }
             return offset;
         }
@@ -253,14 +275,14 @@ namespace Pomelo.Protobuf
 
         private void WriteRawLittleEndian64(byte[] buffer, int offset, ulong value)
         {
-            buffer[offset++] = ((byte)value);
-            buffer[offset++] = ((byte)(value >> 8));
-            buffer[offset++] = ((byte)(value >> 16));
-            buffer[offset++] = ((byte)(value >> 24));
-            buffer[offset++] = ((byte)(value >> 32));
-            buffer[offset++] = ((byte)(value >> 40));
-            buffer[offset++] = ((byte)(value >> 48));
-            buffer[offset++] = ((byte)(value >> 56));
+            buffer[offset++] = (byte)value;
+            buffer[offset++] = (byte)(value >> 8);
+            buffer[offset++] = (byte)(value >> 16);
+            buffer[offset++] = (byte)(value >> 24);
+            buffer[offset++] = (byte)(value >> 32);
+            buffer[offset++] = (byte)(value >> 40);
+            buffer[offset++] = (byte)(value >> 48);
+            buffer[offset++] = (byte)(value >> 56);
         }
     }
 }

@@ -40,10 +40,15 @@
           "type": "CustomMsg",
           "id": 3
         },
-        "i64arr": {
+        "i32arr": {
           "rule": "repeated",
           "type": "uint32",
           "id": 4
+        },
+        "flarr": {
+          "rule": "repeated",
+          "type": "float",
+          "id": 5
         }
       }
     }
