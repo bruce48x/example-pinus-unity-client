@@ -68,23 +68,23 @@ namespace Pomelo.Protobuf
                 {
                     var valueType = protoField["type"];
                     var valueId = protoField["id"];
-                    if (!(valueType is null) && !(valueId is null))
+                    if (valueType != null && valueId != null)
                     {
                         offset = writeBytes(buffer, offset, encodeTag(valueType.ToString(), Convert.ToInt32(valueId)));
-                        offset = encodeProp(msg[key], valueType.ToString(), offset, buffer, proto);
+                        offset = encodeProp(pair.Value, valueType.ToString(), offset, buffer, false);
                     }
                 }
                 else
                 {
                     if (fieldRule.ToString() == "repeated")
                     {
-                        var arr = msg[key];
+                        var arr = (JToken)pair.Value;
                         if (arr != null)
                         {
                             var ls = arr.ToObject<List<object>>();
                             if (ls.Count > 0)
                             {
-                                offset = encodeArray(ls, protoField, offset, buffer, proto);
+                                offset = encodeArray(ls, protoField, offset, buffer);
                             }
                         }
                     }
@@ -96,19 +96,19 @@ namespace Pomelo.Protobuf
         /// <summary>
         /// Encode the array type.
         /// </summary>
-        private int encodeArray(List<object> msg, JObject value, int offset, byte[] buffer, JObject proto)
+        private int encodeArray(List<object> msg, JObject protoField, int offset, byte[] buffer)
         {
-            var valueType = value["type"];
-            var valueId = value["id"];
-            if (valueType != null && valueId != null)
+            var type = protoField["type"];
+            var id = protoField["id"];
+            if (type != null && id != null)
             {
                 foreach (object item in msg)
                 {
                     int length = Encoder.byteLength(msg.ToString()) * 2;
                     int subOffset = 0;
                     byte[] subBuff = new byte[length];
-                    offset = writeBytes(buffer, offset, encodeTag("repeated", Convert.ToInt32(valueId)));
-                    subOffset = encodeProp(item, valueType.ToString(), subOffset, subBuff, proto);
+                    offset = writeBytes(buffer, offset, encodeTag("repeated", Convert.ToInt32(id)));
+                    subOffset = encodeProp(item, type.ToString(), subOffset, subBuff, true);
                     offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
                     for (var i = 0; i < subOffset; i++)
                     {
@@ -123,7 +123,7 @@ namespace Pomelo.Protobuf
         /// <summary>
         /// Encode each item in message.
         /// </summary>
-        private int encodeProp(object value, string type, int offset, byte[] buffer, JObject proto)
+        private int encodeProp(object value, string type, int offset, byte[] buffer, bool inArray)
         {
             switch (type)
             {
@@ -154,23 +154,31 @@ namespace Pomelo.Protobuf
                     writeBool(buffer, ref offset, value);
                     break;
                 default:
-                    JObject message = util.GetProtoMessage(protos, type);
-                    //Console.WriteLine("encodeProp type " + type + ", message " + message);
-                    if (!(message is null))
-                    {
-                        byte[] subBuff = new byte[Encoder.byteLength(value.ToString()) * 3];
-                        int subOffset = 0;
-                        subOffset = encodeMsg(subBuff, subOffset, message, (JObject)value);
-                        offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
-                        for (int i = 0; i < subOffset; i++)
-                        {
-                            buffer[offset + i] = subBuff[i];
-                        }
-                        offset += subOffset;
-                    }
+                    encodeObject(type, (JObject)value, ref offset, buffer, inArray);
                     break;
             }
             return offset;
+        }
+
+        private void encodeObject(string type, JObject msg, ref int offset, byte[] buffer, bool inArray)
+        {
+            JObject subProto = util.GetProtoMessage(protos, type);
+            if (subProto != null)
+            {
+                byte[] subBuff = new byte[Encoder.byteLength(msg.ToString())];
+                int subOffset = 0;
+                subOffset = encodeMsg(subBuff, subOffset, subProto, msg);
+                if (!inArray)
+                {
+                    // 不在数组里，则需要记录长度
+                    offset = writeBytes(buffer, offset, Encoder.encodeUInt32((uint)subOffset));
+                }
+                for (int i = 0; i < subOffset; i++)
+                {
+                    buffer[offset + i] = subBuff[i];
+                }
+                offset += subOffset;
+            }
         }
 
         //Encode string.

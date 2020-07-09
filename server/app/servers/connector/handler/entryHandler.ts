@@ -1,6 +1,7 @@
 import { Application, FrontendSession } from 'pinus';
 import * as Logger from 'pinus-logger';
 const logger = Logger.getLogger('server', __filename);
+import * as util from 'util';
 
 export default function (app: Application) {
     return new Handler(app);
@@ -18,9 +19,10 @@ export class Handler {
      * @param  {Object}   session current session object
      */
     async entry(msg: any, session: FrontendSession) {
-        logger.warn("entry recv", msg);
+        logger.warn("entry recv", util.inspect(msg, false, 10));
         const code = msg.name ? 0 : 1;
         const rcvmsg = `receive name = ${msg.name}`;
+        const i32 = 48;
         const cusMsg = { i32: 9, i32arr: [7, 5, 3] };
         const msgArr = [
             { i32: 1, i32arr: [1000, 2000, 3000] },
@@ -31,11 +33,12 @@ export class Handler {
         const dbArr = [0.3, 0.2, 0.1];
         return {
             code,
+            i32,
             rcvmsg,
-            cusMsg,
-            msgArr,
             flArr,
             dbArr,
+            cusMsg,
+            msgArr,
         };
     }
 

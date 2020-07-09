@@ -12,4 +12,5 @@ message connectorentryHandlerentry {
     repeated CustomMsg msgArr = 4;
     repeated float flArr = 5;
     repeated double dbArr = 6;
+    uint32 i32 = 7;
 }

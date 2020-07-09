@@ -41,6 +41,10 @@
           "rule": "repeated",
           "type": "double",
           "id": 6
+        },
+        "i32": {
+          "type": "uint32",
+          "id": 7
         }
       }
     }
